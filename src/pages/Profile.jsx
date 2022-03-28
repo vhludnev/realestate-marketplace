@@ -95,7 +95,7 @@ const Profile = () => {
       await deleteDoc(doc(db, 'listings', listingId))
       const updatedListings = listings.filter((listing) => listing.id !== listingId)
       setListings(updatedListings)
-      toast.success('Successfully deleted listing')
+      toast.success('Successfully deleted listing', {autoClose: 2000})
     }
   }
 
@@ -117,8 +117,11 @@ const Profile = () => {
           <p className='profileDetailsText'>Personal Details</p>
           <p className='changePersonalDetails'
              onClick={() => {
-              changeDetails && onSubmit()
-              setChangeDetails((prevState) => !prevState)
+              //changeDetails && onSubmit()
+              //setChangeDetails((prevState) => !prevState)
+              if (changeDetails) {
+                onSubmit().then(() => setChangeDetails(!changeDetails))
+              }
             }}
           >
             {changeDetails ? 'done' : 'change'}

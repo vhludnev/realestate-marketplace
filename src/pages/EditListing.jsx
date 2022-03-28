@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect/* , useRef */ } from 'react'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import {
   getStorage,
@@ -13,26 +13,44 @@ import { toast } from 'react-toastify'
 import { v4 as uuidv4 } from 'uuid'
 import Spinner from '../components/Spinner'
 
+const initialFormState = {
+  type: 'rent',
+  name: '',
+  bedrooms: 1,
+  bathrooms: 1,
+  parking: false,
+  furnished: false,
+  address: '',
+  offer: false,
+  regularPrice: 0,
+  discountedPrice: 0,
+  images: {},
+  latitude: null,
+  longitude: null,
+}
+
 const EditListing = () => {
   // eslint-disable-next-line
-  const [geolocationEnabled, setGeolocationEnabled] = useState(true)
+  const [geolocationEnabled, setGeolocationEnabled] = useState(false)
   const [loading, setLoading] = useState(false)
   const [listing, setListing] = useState(false)
-  const [formData, setFormData] = useState({
-    type: 'rent',
-    name: '',
-    bedrooms: 1,
-    bathrooms: 1,
-    parking: false,
-    furnished: false,
-    address: '',
-    offer: false,
-    regularPrice: 0,
-    discountedPrice: 0,
-    images: {},
-    latitude: null,
-    longitude: null,
-  })
+  const [formData, setFormData] = useState(initialFormState
+    // {
+    //   type: 'rent',
+    //   name: '',
+    //   bedrooms: 1,
+    //   bathrooms: 1,
+    //   parking: false,
+    //   furnished: false,
+    //   address: '',
+    //   offer: false,
+    //   regularPrice: 0,
+    //   discountedPrice: 0,
+    //   images: {},
+    //   latitude: null,
+    //   longitude: null,
+    // }
+  )
 
   const {
     type,
@@ -54,7 +72,7 @@ const EditListing = () => {
   const auth = getAuth()
   const navigate = useNavigate()
   const params = useParams()
-  const isMounted = useRef(true)
+  //const isMounted = useRef(true)
 
   // Redirect if listing is not user's
   useEffect(() => {
@@ -85,28 +103,29 @@ const EditListing = () => {
 
   // Sets userRef to logged in user
   useEffect(() => {
-    if (isMounted) {
-      onAuthStateChanged(auth, (user) => {
+    //if (isMounted) {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
         if (user) {
-          setFormData({ ...formData, userRef: user.uid })
+          setFormData({ ...initialFormState, userRef: user.uid })
         } else {
           navigate('/sign-in')
         }
       })
-    }
+    //}
 
-    return () => {
-      isMounted.current = false
-    }
+    return unsubscribe
+    // return () => {
+    //   isMounted.current = false
+    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMounted])
+  }, [/* isMounted */ auth, navigate])
 
   const onSubmit = async (e) => {
     e.preventDefault()
 
     setLoading(true)
 
-    if (discountedPrice >= regularPrice) {
+    if (+discountedPrice >= +regularPrice) {
       setLoading(false)
       toast.error('Discounted price needs to be less than regular price')
       return
@@ -216,7 +235,7 @@ const EditListing = () => {
     const docRef = doc(db, 'listings', params.listingId)
     await updateDoc(docRef, formDataCopy)
     setLoading(false)
-    toast.success('Listing saved')
+    toast.success('Listing saved', {autoClose: 2000})
     navigate(`/category/${formDataCopy.type}/${docRef.id}`)
   }
 

@@ -10,6 +10,7 @@ import { getDoc, doc } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 import { db } from '../firebase.config'
 import Spinner from '../components/Spinner'
+import formatMoney from '../utils/formatMoney'
 import shareIcon from '../assets/svg/shareIcon.svg'
 //SwiperCore.use([Navigation, Pagination, Scrollbar, A11y])   // for Swiper v.6
 
@@ -49,9 +50,9 @@ const Listing = () => {
     const { lng, lat } = listing.geolocation
     center = [lat, lng]
   } */
-
-  //console.log(listing.imageUrls[0])
   
+  //console.log(formatMoney(listing.regularPrice).replace(/\D00(?=\D*$)/, ''))
+
   return (
     <main>
       <Helmet>
@@ -96,14 +97,18 @@ const Listing = () => {
 
       <div className='listingDetails'>
         <p className='listingName'>
-          {listing.name} - $
-          {listing.offer
+          {listing.name} - {' '}
+          {/* $
+           {listing.offer
             ? listing.discountedPrice
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ',')          // adds comma for every thousand
             : listing.regularPrice
                 .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ',')} */}
+          {listing.offer
+            ? formatMoney(listing.discountedPrice)
+            : formatMoney(listing.regularPrice)}
         </p>
         <p className='listingLocation'>{listing.location}</p>
         <p className='listingType'>
@@ -111,7 +116,8 @@ const Listing = () => {
         </p>
         {listing.offer && (
           <p className='discountPrice'>
-            ${listing.regularPrice - listing.discountedPrice} discount
+            {/* ${listing.regularPrice - listing.discountedPrice} discount */}
+            {formatMoney(listing.regularPrice-listing.discountedPrice)} discount
           </p>
         )}
 
@@ -136,7 +142,7 @@ const Listing = () => {
           <MapContainer
             style={{ height: '100%', width: '100%' }}
             center={[listing.geolocation.lat, listing.geolocation.lng]}
-            zoom={13}
+            zoom={14}
             scrollWheelZoom={false}
             attributionControl={false}
             //placeholder={<p>Listing Map</p>}

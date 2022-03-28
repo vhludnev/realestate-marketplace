@@ -6,6 +6,7 @@ import /* SwiperCore, */ { Navigation, Pagination, Scrollbar, A11y } from 'swipe
 import { Swiper, SwiperSlide } from 'swiper/react'
 //import 'swiper/swiper-bundle.css'
 import 'swiper/css/bundle'
+import formatMoney from '../utils/formatMoney'
 import Spinner from './Spinner'
 //SwiperCore.use([Navigation, Pagination, Scrollbar, A11y])     // for Swiper v.6
 
@@ -70,7 +71,10 @@ const Slider = () => {
               >
                 <p className='swiperSlideText'>{data.name}</p>
                 <p className='swiperSlidePrice'>
-                  ${data.discountedPrice ?? data.regularPrice}{' '}
+                  {/* ${data.discountedPrice ?? data.regularPrice}{' '} */}
+                  {data.discountedPrice
+                    ? formatMoney(data.discountedPrice)
+                    : formatMoney(data.regularPrice)}{' '}
                   {data.type === 'rent' && '/ month'}
                 </p>
               </div>
